@@ -1,4 +1,9 @@
+
+from lib.db.setup import session
+from lib.db.setup import create_tables
+
 from lib.db.setup import session, create_tables
+
 from lib.models.user import User
 from lib.models.tool import Tool
 from lib.models.part import Part
@@ -48,7 +53,11 @@ def main_menu():
             for tool in tools:
                 print(f"\nID: {tool.id}| Name: {tool.name} | Description: {tool.description}")
         elif choice == "6":
+
+            tool_id = int(input("\nEnter tool ID to Delete: "))
+
             tool_id = int(input("\nEnter tool ID to Delete"))
+
             if Tool.delete(session, tool_id):
                 print("\n~~~~~ Tool deleted. ~~~~~")
             else:
@@ -80,8 +89,23 @@ def main_menu():
         elif choice == "10":
             user_id = int(input("\nEnter User ID: "))
             tool_id = int(input("\nEnter Tool ID: "))
-            Checkout.create(session, user_id, tool_id)
-            print("\n~~~~~ Checkout created. ~~~~~.")
+
+
+            user = User.find_by_id(session, user_id)
+            tool = Tool.find_by_id(session, tool_id)
+        
+            if not user and not tool:
+                print("\n~~~~~ Error: Both User ID and Tool ID are invalid. ~~~~~")
+            elif not user:
+                print("\n~~~~~ Error: User ID is invalid. ~~~~~")
+            elif not tool:
+                print("\n~~~~~ Error: Tool ID is invalid. ~~~~~")
+            else:
+                Checkout.create(session, user_id, tool_id)
+                print("\n~~~~~ Checkout created. ~~~~~.")
+
+            
+
         elif choice == "11":
             checkouts = Checkout.get_all(session)
             for checkout in checkouts:
